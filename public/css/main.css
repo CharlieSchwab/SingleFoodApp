@@ -1,0 +1,48 @@
+html{
+  background-color: beige;
+}
+.responsive {
+  width: 100%;
+  max-width: 2000px;
+  height: 200px;
+}
+.main_content {
+  position: absolute; /* Position the background text */
+  top: 0; /* At the bottom. Use top:0 to append it to the top */
+  background: rgba(255, 255, 255, 0.7); /* Black background with 0.5 opacity */
+  color: black; /* Grey text */
+  width: 100%; /* Full width */
+  height: 200px;
+  padding: 20px; /* Some padding */
+  margin: 0 auto;
+}
+.main_content *{
+  vertical-align: middle;
+  text-align:center;
+}
+.w3-bar-block{
+  margin-top: 70px;
+  margin-left: 100px;
+}
+.w3-bar-block a{
+  text-decoration: none;
+}
+.w3-bar-block a:hover{
+  background-color: white!important;
+  color:goldenrod!important;
+  border-left:1px solid goldenrod!important;
+}
+
+.table{
+  margin-top: 40px;
+}
+
+.table tbody td{
+  vertical-align: middle!important;
+}
+
+.bucket{
+  margin-top:80px;
+  padding-left:50px;
+  padding-right: 50px;
+}
