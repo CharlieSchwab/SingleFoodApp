@@ -16,10 +16,10 @@
   export default {
     methods: {
       inc() {
-        this.$emit('update', this.item, this.quantity+1 );
+        this.$emit('increase', this.item, this.quantity+1 );
       },
       dec() {
-        this.$emit('update', this.item, this.quantity-1 );
+        this.$emit('decrease', this.item, this.quantity-1 );
       },
       del() {
         this.$emit('delete', this.item);
