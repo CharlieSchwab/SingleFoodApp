@@ -1,5 +1,8 @@
 <?php
 
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StripeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,7 +14,12 @@
 |
  */
 
-Route::get('/{id}/{cat?}', 'MainController@firstPage');
+
+
+Route::get('/customer/{id}/{cat?}', 'MainController@firstPage');
+
+Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
+Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
 
 Route::get('/admin', 'AuthController@login');
 Route::post('admin/login', 'AuthController@Postlogin');

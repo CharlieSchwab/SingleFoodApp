@@ -20,9 +20,9 @@
         <img src="{{url('public/img/header.jpg')}}" alt="Nature" class="responsive">
         
         <div class="main_content">
-          @if ($restaurant->logo != "")
+          {{-- @if ($restaurant->logo != "")
             <img src="{{$restaurant->logo}}" heigth="70%">
-          @endif
+          @endif --}}
           <h1>{{$restaurant->name}}</h1>
           <p>{{$restaurant->address_one}} {{$restaurant->address_two}} {{$restaurant->city}}</p>
         </div>    
@@ -33,7 +33,7 @@
       <div class="col-md-3" >
         <div class="w3-bar-block">
             @foreach ($category as $cat)
-              <a href="{{url('/').'/'.$cat->user_id.'/'.$cat->category_order_by}}" class="w3-bar-item w3-button "> {{$cat->name}}</a>
+              <a href="{{url('/customer').'/'.$cat->user_id.'/'.$cat->category_order_by}}" class="w3-bar-item w3-button "> {{$cat->name}}</a>
             @endforeach
         </div>
       </div>
@@ -53,7 +53,7 @@
             @foreach($items as $item)
             <tr>
               <td class="itemName">{{$item->item_name}}</td>
-              <td><img src={{$item->item_image}} width="200px" height="200px"></td>
+              <td><img src="{{$item->item_image}}" width="200px" height="200px"></td>
               <td class="itemPrice">${{$item->price}}</td>
               <td>{{$item->item_description}}</td>
               <td><button class="addcart" name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></td>
@@ -63,7 +63,7 @@
         </table>
       </div> 
       <div class="col-md-4 bucket" >
-        <h2  align="center">My Purchase</h2><button style="" id="buycart">Buy!</button>
+        <h2  align="center">My Purchase</h2><a href="{{url('/stripe-payment')}}"><button id="buycart">Buy!</button></a>
         <table class="table ">
           <thead align="center">
             <tr class="table-active">
@@ -96,7 +96,7 @@
         if(Mypur != null){
           Mypur.forEach(item=>{
             if(item){
-              $("#listbody").append(`<tr><td class="itemNorm">${item.itemN}</td><td class="itemQuan">${item.itemQ}</td><td class="itemP">${item.itemP}</td><td><button class="delitem"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
+              $("#listbody").append(`<tr><td class="itemNorm">${item.itemN}</td><td class="itemQuan">${item.itemQ}</td><td class="itemP">$${item.itemP}</td><td><button class="delitem"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
             }
           });
         }
@@ -171,12 +171,12 @@
           $.each($("#listbody").children(), function( index) {
             if($(this).find(".itemNorm").text()==itemN){
               $(this).find(".itemQuan").text(itemQ);
-              $(this).find(".itemP").text(itemP);
+              $(this).find(".itemP").text("$"+itemP);
             }
           });
          
           if(newItem == 1){
-            $("#listbody").append(`<tr><td class="itemNorm">${itemN}</td><td class="itemQuan">${itemQ}</td><td class="itemP">${itemP}</td><td><button class="delitem"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
+            $("#listbody").append(`<tr><td class="itemNorm">${itemN}</td><td class="itemQuan">${itemQ}</td><td class="itemP">$${itemP}</td><td><button class="delitem"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
           }
               
           $(".delitem").click(function(){
