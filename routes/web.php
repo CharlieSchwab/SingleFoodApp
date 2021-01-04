@@ -14,12 +14,14 @@ use App\Http\Controllers\StripeController;
 |
  */
 
-
-
 Route::get('/customer/{id}/{cat?}', 'MainController@firstPage');
+Route::post('/customer/login', 'MainController@login');
+Route::post('/customer/register', 'MainController@register');
+
 
 Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
 Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
+
 
 Route::get('/admin', 'AuthController@login');
 Route::post('admin/login', 'AuthController@Postlogin');

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Laravel 7 - Integrate Stripe Payment Gateway Example</title>
+	<title>Payment Gateway</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <style type="text/css">
@@ -92,10 +92,9 @@
   
                         <div class="row">
                             <div class="col-xs-12">
-                                <button class="btn btn-danger btn-lg btn-block" type="submit">Pay Now (₹100)</button>
+                                <button class="btn btn-danger btn-lg btn-block" id="subbut" type="submit">Pay Now </button>
                             </div>
-                        </div>
-                          
+                        </div>                         
                     </form>
                 </div>
             </div>        
@@ -106,6 +105,16 @@
 </body>
   
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script>
+    $(document).ready(function(){
+        const charge = sessionStorage.getItem("total");
+        $("#subbut").text("Pay Now $" + charge);
+        $("#payment-form").append(`<input type="hidden" name="chargeAmount" value=${charge} >`);
+    })
+</script>
+
+
   
 <script type="text/javascript">
 $(function() {

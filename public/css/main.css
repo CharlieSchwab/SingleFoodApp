@@ -1,6 +1,4 @@
-html{
-  background-color: beige;
-}
+
 .responsive {
   width: 100%;
   max-width: 2000px;
@@ -20,29 +18,5 @@ html{
   vertical-align: middle;
   text-align:center;
 }
-.w3-bar-block{
-  margin-top: 70px;
-  margin-left: 100px;
-}
-.w3-bar-block a{
-  text-decoration: none;
-}
-.w3-bar-block a:hover{
-  background-color: white!important;
-  color:goldenrod!important;
-  border-left:1px solid goldenrod!important;
-}
 
-.table{
-  margin-top: 40px;
-}
 
-.table tbody td{
-  vertical-align: middle!important;
-}
-
-.bucket{
-  margin-top:80px;
-  padding-left:50px;
-  padding-right: 50px;
-}
