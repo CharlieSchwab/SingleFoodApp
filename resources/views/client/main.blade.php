@@ -132,6 +132,10 @@
       color: #818181;
       cursor:default;
     }
+
+    .loginnav{
+      cursor: pointer;
+    }
    
       
     </style>
@@ -149,35 +153,22 @@
         </div>    
     </header>
     <div class="noti"></div>
-    <!-- The Modal -->
+    @if(!empty(session('error')))
+    <div class="alert alert-danger fade in" role="alert" style="background: red; position: absolute;top:0;right:0;z-index:999999!important">
+      {{ session('error') }}
+    </div>
+    @endif
+    @if(!empty(session('userid')))
+      <h1>{{session('userid')}}</h1>
+    @endif
     <div class="modal fade" id="myModal">
       <div class="modal-dialog">
         <div class="modal-content">
-    
-          <!-- Modal Header -->
           <div class="modal-header">
             <h4 class="modal-title" style="text-align:center">Please enter Name and Password</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
-    
-          <!-- Modal body -->
           <div class="modal-body">
-            {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
-            <script>
-              function loginStart(){
-                $.ajax({
-                  url: "/customer/login",
-                  context: {
-                      userN : $('#userN').value,
-                      userP : $('#userP').value
-                  }
-                }).done(function() {
-                  alert("ok");
-                }).fail(function(){
-                  alert("fail");
-                })
-              }
-            </script>
             <form action="{{url('/customer/login')}}" method="post">
               {{ csrf_field() }}
               <div class="form-group">
@@ -186,14 +177,15 @@
               </div>
               <div class="form-group">
                 <label>User Password:</label>
-                <input placeholder="Input Password" class="form-control" type="text" name="userP" id="userP">
+                <input placeholder="Input Password" class="form-control" type="password" name="userP" id="userP">
               </div>
-              If you haven't signed up yet, please <a data-toggle="modal" data-target="#register" href="#" > <span class="text text-primary register">sign up</span></a>
-              
-              <div style="margin-left:30%">
+              <div align="center">
+                If you haven't signed up yet, please <a data-toggle="modal" data-target="#register"><span class="text text-primary register">sign up</span></a>
+              </div>
+              <div align="center" class="mt-3">
                 <input type="hidden" name="userR" id="userR" value="{{$restaurant->restaurant_id}}">
-                <a class="btn btn-primary" href="javascript:loginStart()" >Login</a>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="submit">Login</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
               </div>
             </form>
           </div>
@@ -201,67 +193,51 @@
       </div>
     </div>
     <div class="modal fade" id="register">
-      <script>
-          function registerStart(){
-              $.ajax({
-                url: "/customer/register",
-                context: {
-                    email : $('#email').value,
-                    pass1 : $('#psw').value,
-                    pass2 : $('#psw-repeat')
-                }
-              }).done(function() {
-                alert("ok");
-              }).fail(function(){
-                alert("fail");
-              })
-        </script>
       <div class="modal-dialog">
         <div class="modal-content">
-          
           <div class="modal-header">
             <h4 class="modal-title" style="text-align:center">Please register</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <form action="action_page.php">
+            <form action="{{ route('register')}}" method="POST">
+              {{ csrf_field() }}
               <div class="container-fluid">
                 <div class="form-group">
-                  <label for="email"><b>Email</b></label>
-                  <input type="text" placeholder="Enter Email" name="email" id="email" required>
+                  <label for="username"><b>Username</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Username" name="name" id="name" required>
                 </div>
-
+                <div class="form-group">
+                  <label for="email"><b>Email</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Email" name="email" id="email" required>
+                </div>
                 <div class="form-group">
                   <label for="psw"><b>Password</b></label>
-                  <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                  <input type="password" class="form-control" placeholder="Enter Password" name="password" id="password" required>
                 </div>
                 <div class="form-group">
                   <label for="psw-repeat"><b>Repeat Password</b></label>
-                  <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
+                  <input type="password" class="form-control" placeholder="Repeat Password" name="password_confirmation" id="password_confirmation" required>
                 </div>
-                <hr>
-                <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
-                <button type="button" onclick="registerStart()" class="registerbtn">Register</button>
-              </div>
-  
-              <div class="container signin">
-                <p>Already have an account? <a data-target="#myModal" data-toggle="modal" href="#">Sign in</a>.</p>
+                <div class="button-group" align="center">
+                  <button type="submit" class="btn btn-primary registerbtn">Register</button>
+                  <button type="button" class="btn btn-warning" data-dismiss="modal">Back</button>.  
+                </div>
               </div>
             </form>
           </div>
-          
         </div>
       </div>
     </div>
-
-   
     <div id="navbar">
       <a href="javascript:openNav()">Restaurant Menu</a>
       <a href="javascript:openNav2()">My Purchase</a>
-      @if ($user == 'guest')
-      <a data-toggle="modal" data-target="#myModal" href="#" >Login</a>
+      @if(!empty(session('userid')))
+      <a class="loginnav" href="{{route('logout')}}" >Signout</a>
       @else
-      {{-- <a href="{{route('/customer/2'.$restaurant->retaurant_id)}}" >Signout</a> --}}
+      <a class="loginnav" data-toggle="modal" data-target="#myModal">
+        Login
+      </a>
       @endif
     </div>
 
@@ -278,20 +254,19 @@
         <h2 style="color:chocolate" align="center">My Purchase</h2>
         <a style="display:inline-block; margin-left:10%" href="{{url('/stripe-payment')}}"><button class="btn btn-primary" id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
         <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
-          <table class="table" id="purchaseTable">
-            <thead align="center">
-              <tr class="table-active">
-                <td>Item</td>
-                <td>Quantity</td>
-                <td>Price</td>
-                <td>Cancel</td>
-              </tr>
-            </thead>
-            <tbody align="center" id="listbody">
-              
-
-            </tbody>
-          </table>
+        
+        <table class="table" id="purchaseTable">
+          <thead align="center">
+            <tr class="table-active">
+              <td>Item</td>
+              <td>Quantity</td>
+              <td>Price</td>
+              <td>Cancel</td>
+            </tr>
+          </thead>
+          <tbody align="center" id="listbody">
+          </tbody>
+        </table>
     </div>
     
       <div class="container">
