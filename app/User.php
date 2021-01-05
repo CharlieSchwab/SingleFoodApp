@@ -29,4 +29,7 @@ class User extends Authenticatable
 		return self::where('status', '=', '0')->where('is_delete','=','0')->whereIn('is_admin', [1, 2])->get();
 	}
 	
+	protected $fillable = [
+		'name', 'email', 'password','username', 'phone', 'postcode', 'address_one', 'address_two', 'city'
+	];
 }
