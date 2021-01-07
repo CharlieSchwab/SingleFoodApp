@@ -1,11 +1,13 @@
 <?php
 
-Route::post('login', 'ApiController@Login');
-Route::post('register', 'ApiController@Register');
-Route::post('forgotpassword', 'ApiController@forgotpassword');
+// Route::post('login', 'ApiController@Login');
+// Route::post('register', 'ApiController@Register');
+// Route::post('forgotpassword', 'ApiController@forgotpassword');
 
-Route::post('mobile_check', 'ApiController@mobile_check');
-Route::post('check_forgot_password', 'ApiController@check_forgot_password');
+// Route::post('mobile_check', 'ApiController@mobile_check');
+// Route::post('check_forgot_password', 'ApiController@check_forgot_password');
+
+
 
 Route::post('getrestaurant', 'ApiController@getRestaurant');
 

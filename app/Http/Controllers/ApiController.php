@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use File;
 use Hash;
+use Session;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\User;
@@ -39,13 +41,16 @@ class ApiController extends Controller {
 	public $token;
 
 	public function __construct(Request $request) {
-		$this->restaurant_id = !empty($request->header('restaurantid'))?$request->header('restaurantid'):'';
+		$this->restaurant_id = !empty($request->header('restaurantid'))?$request->header('restaurantid'):'2';
 		$this->token = !empty($request->header('token'))?$request->header('token'):'';
 	}
 
 	public function Login(Request $request) {
+
+		// $this->restaurant_id = 2;
 		
 		if (!empty($this->restaurant_id) && !empty($request->phone) && !empty($request->password)) {
+
 			$checkRestaurant = $this->checkRestaurant($this->restaurant_id);
 			if(!empty($checkRestaurant))
 			{
@@ -71,7 +76,7 @@ class ApiController extends Controller {
 						$this->updateToken($user->id);
 
 						$json['status'] = true;
-						$json['message'] = 'Record found.';
+						$json['message'] = 'Successfully logged in.';
 						$json['result'] = $this->getProfileUser($user->id);
 					} else {
 						$json['status'] = false;
@@ -95,11 +100,70 @@ class ApiController extends Controller {
 			$json['message'] = 'Due to some error please try again.';
 		}
 
-		echo json_encode($json);
+		if(!empty($user)){
+				
+			Session::put('userid',$user->id);
+			Session::put('name',$user->name);
+			Session::put('e-mail',$user->email);
+			Session::put('address1',$user->address_one);
+			Session::put('address2',$user->address_two);
+			Session::put('city',$user->city);
+			Session::put('postcode',$user->postcode);
+
+		}
+
+
+		Session::flash('message', $json['message']);
+
+		// $all = session()->all();
+		// echo(json_encode($all));die;
+		
+		return redirect()->back();
+
+	}
+
+	public function Logout() {
+
+		Session::put('userid',"");
+
+		// $all = session()->all();
+		// echo(json_encode($all));die;
+
+		Session::flash('message', "User signed out");
+
+		return redirect()->back();
+	}
+
+	public function EditProfile(Request $request) {
+
+		$userid = Session::get('userid');
+
+		User::where('id','=',$userid)->update(array(
+			'name'=>$request->name,
+			'email'=>$request->email,
+			'address_one'=>$request->address1,
+			'address_two'=>$request->address2,
+			'city'=>$request->city,
+			'postcode'=>$request->postcode,
+		));
+
+		Session::put('name',$request->name);
+		Session::put('e-mail',$request->email);
+		Session::put('address1',$request->address1);
+		Session::put('address2',$request->address2);
+		Session::put('city',$request->city);
+		Session::put('postcode',$request->postcode);
+
+		Session::flash('message', 'Profile successfully updated');
+
+		return redirect()->back();
 	}
 
 	public function Register(Request $request) {
-		if (!empty($this->restaurant_id) && !empty($request->phone) && !empty($request->phone) && !empty($request->password)) {
+
+		// $this->restaurant_id = 2;
+
+		if (!empty($this->restaurant_id) && !empty($request->username) && !empty($request->phone) && !empty($request->password) && $request->password == $request->password_confirmation) {
 			$checkRestaurant = $this->checkRestaurant($this->restaurant_id);
 			if(!empty($checkRestaurant))
 			{
@@ -134,7 +198,9 @@ class ApiController extends Controller {
 			$json['status'] = false;
 			$json['message'] = 'Due to some error please try again.';
 		}
-		echo json_encode($json);
+
+		Session::flash('message', $json['message']);
+		return redirect()->back();
 	}
 
 

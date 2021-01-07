@@ -136,11 +136,59 @@
     .loginnav{
       cursor: pointer;
     }
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
    
       
     </style>
 </head>
-<body>
+<body onload="myFunction()">
+  @if (Session::has('message'))
+  <div id="snackbar" class="show">{{ Session::get('message') }}</div>
+  @endif
+  
     <header>
         <img src="{{url('public/img/header.jpg')}}" alt="Nature" class="responsive">
         
@@ -152,35 +200,28 @@
           <p>{{$restaurant->address_one}} {{$restaurant->address_two}} {{$restaurant->city}}</p>
         </div>    
     </header>
-    <div class="noti"></div>
-    @if(!empty(session('error')))
-    <div class="alert alert-danger fade in" role="alert" style="background: red; position: absolute;top:0;right:0;z-index:999999!important">
-      {{ session('error') }}
-    </div>
-    @endif
-    @if(!empty(session('userid')))
-      <h1>{{session('userid')}}</h1>
-    @endif
+
     <div class="modal fade" id="myModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" style="text-align:center">Please enter Name and Password</h4>
+            <h4 class="modal-title" style="text-align:center">Please enter Phone Number and Password</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <form action="{{url('/customer/login')}}" method="post">
+            <form action="{{url('login')}}" method="post">
               {{ csrf_field() }}
+              
               <div class="form-group">
-                <label>User Name:</label>
-                <input placeholder="Input Name" class="form-control" type="text" name="userN" id="userN">
+                <label>Phone Number:</label>
+                <input placeholder="Input Phone Number" class="form-control" type="text" name="phone" id="phone" required>
               </div>
               <div class="form-group">
-                <label>User Password:</label>
-                <input placeholder="Input Password" class="form-control" type="password" name="userP" id="userP">
+                <label>Password:</label>
+                <input placeholder="Input Password" class="form-control" type="password" name="password" id="password" required>
               </div>
               <div align="center">
-                If you haven't signed up yet, please <a data-toggle="modal" data-target="#register"><span class="text text-primary register">sign up</span></a>
+                If you haven't signed up yet, please <a data-toggle="modal" data-target="#register"><span style="cursor:pointer"class="text text-primary register">sign up</span></a>
               </div>
               <div align="center" class="mt-3">
                 <input type="hidden" name="userR" id="userR" value="{{$restaurant->restaurant_id}}">
@@ -204,12 +245,12 @@
               {{ csrf_field() }}
               <div class="container-fluid">
                 <div class="form-group">
-                  <label for="username"><b>Username</b></label>
-                  <input type="text" class="form-control" placeholder="Enter Username" name="name" id="name" required>
+                  <label><b>Username</b></label>
+                  <input placeholder="Enter Username" class="form-control" type="text" name="username"  required>
                 </div>
                 <div class="form-group">
-                  <label for="email"><b>Email</b></label>
-                  <input type="text" class="form-control" placeholder="Enter Email" name="email" id="email" required>
+                  <label for="email"><b>Phone Number</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Phone Number" name="phone" id="phone" required>
                 </div>
                 <div class="form-group">
                   <label for="psw"><b>Password</b></label>
@@ -229,15 +270,63 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="modalProfile">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" style="text-align:center">Please Edit Profile</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ route('register2')}}" method="POST">
+              {{ csrf_field() }}
+              <div class="container-fluid">
+                <div class="form-group">
+                  <label for="name"><b>Name</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Name" name="name" value="{{ Session::has('name') ? Session::get('name') : ''}}">
+                </div>
+                <div class="form-group">
+                  <label for="email"><b>Email</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Email" name="email" value="{{ Session::has('e-mail') ? Session::get('e-mail') : ''}}">
+                </div>
+                <div class="form-group">
+                  <label for="email"><b>Address 1</b></label>
+                  <input type="text" class="form-control" placeholder="Enter your address 1" name="address1" value="{{ Session::has('address1') ? Session::get('address1') : ''}}">
+                </div>
+                <div class="form-group">
+                  <label ><b>Address 2</b></label>
+                  <input type="text" class="form-control" placeholder="Enter your address 2" name="address2" value="{{ Session::has('address2') ? Session::get('address2') : ''}}">
+                </div>
+                <div class="form-group">
+                  <label ><b>City</b></label>
+                  <input type="text" class="form-control" placeholder="Enter City Name" name="city" value="{{ Session::has('city') ? Session::get('city') : ''}}">
+                </div>
+                <div class="form-group">
+                  <label ><b>Postal Code</b></label>
+                  <input type="text" class="form-control" placeholder="Enter Postal Code" name="postcode" value="{{ Session::has('postcode') ? Session::get('postcode') : ''}}">
+                </div>
+                <div class="button-group" align="center">
+                  <button type="submit" class="btn btn-primary registerbtn">Ok</button>
+                  <button type="button" class="btn btn-warning" data-dismiss="modal">Back</button>.  
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="navbar">
       <a href="javascript:openNav()">Restaurant Menu</a>
       <a href="javascript:openNav2()">My Purchase</a>
       @if(!empty(session('userid')))
-      <a class="loginnav" href="{{route('logout')}}" >Signout</a>
+      <a class="loginnav" id="logoutButton" href="{{route('logout')}}" >Signout</a>
       @else
       <a class="loginnav" data-toggle="modal" data-target="#myModal">
         Login
       </a>
+      @endif
+      @if(!empty(session('userid')))
+      <a class="loginnav" data-toggle="modal" data-target="#modalProfile" >Profile</a>
       @endif
     </div>
 
@@ -252,8 +341,20 @@
     <div id="Sidenav2" class="sidenav">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">&times;</a>
         <h2 style="color:chocolate" align="center">My Purchase</h2>
-        <a style="display:inline-block; margin-left:10%" href="{{url('/stripe-payment')}}"><button class="btn btn-primary" id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
+        <a style="display:inline-block; margin-left:10%" href="{{url('/stripe-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
         <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
+      <div align="center">
+        <input type="radio" id="delivery" name="delivery_method" value="delivery">
+        <label for="delivery">Delivery</label>
+        <input type="radio" id="collection" name="delivery_method" value="collection">
+        <label for="collection">Collection</label><br>
+      </div>
+      <div align="center">
+        <input type="radio" id="card" name="payment_method" value="card">
+        <label for="card">Card</label>
+        <input type="radio" id="cash" name="payment_method" value="cash">
+        <label for="cash">Cash</label><br>
+      </div>
         
         <table class="table" id="purchaseTable">
           <thead align="center">
@@ -287,14 +388,15 @@
               <td><img src="{{$item->item_image}}" width="200px" height="200px"></td>
               <td class="itemPrice">${{$item->price}}</td>
               <td>{{$item->item_description}}</td>
-              <td><div><button class="addcart btn btn-success" @if ($user=='1guest') disabled  @endif name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></div>
-                @if ($user=='1guest') <p style="color:red;cursor:default"> Please signin to purchase </p> @endif
+              <td><div><button class="addcart btn btn-success" {{ !empty(session('userid')) ? '' : 'disabled' }} name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></div>
+                @if (empty(session('userid'))) <p style="color:red;cursor:default"> Please signin to purchase </p> @endif
               </td>
             </tr>
            @endforeach
           </tbody>
         </table>
       </div> 
+      {{-- <button onclick="myFunction()">Show Snackbar</button> --}}
 
 
     <script>
@@ -330,6 +432,7 @@
   <script>
       $(document).ready(function(){    
 
+
         let itemN;
         let itemP;      
         let itemQ;        
@@ -338,7 +441,9 @@
         let purItem;
         let totPrice = 0;
 
-        let Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+        let Mypur = [];
+        
+        if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
 
         if(totPrice > 0){
           $("#buycart").attr('dsabled','false');
@@ -403,7 +508,7 @@
 
           purItem = {itemN,itemP,itemQ};
 
-          console.log(Mypur);
+          // console.log(Mypur);
 
           Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
 
@@ -483,8 +588,31 @@
           });
 
         });
+
+        
+        $("#logoutButton").click(function(){
+          alert("ok");
+          sessionStorage.setItem("MyPurchase",[]);
+          sessionStorage.setItem("total", 0);
+          Mypur = [];
+          totPrice = 0;
+        });
+
         
       });
+
+     
+
+      function myFunction() {
+        // Get the snackbar DIV
+        var x = document.getElementById("snackbar");
+
+        // Add the "show" class to DIV
+        // x.className = "show";
+
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+      }
 
     </script>
 </body>

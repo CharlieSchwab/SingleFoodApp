@@ -30,6 +30,6 @@ class User extends Authenticatable
 	}
 	
 	protected $fillable = [
-		'name', 'email', 'password','username', 'phone', 'postcode', 'address_one', 'address_two', 'city'
+		'name', 'email', 'password','username', 'phone', 'is_verified', 'postcode', 'address_one', 'address_two', 'city'
 	];
 }
