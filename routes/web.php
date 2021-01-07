@@ -14,10 +14,27 @@ use App\Http\Controllers\StripeController;
 |
  */
 
-Auth::routes();
+ // Authentication Routes...
+Route::post('login', 'ApiController@Login');
+Route::get('logout', 'ApiController@Logout')->name('logout');
 
-Route::post('/customer/login', 'AuthController@clientlogin');
+// Registration Routes...
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+Route::post('register', 'ApiController@Register');
+Route::get('register2', 'Auth\RegisterController@showRegistrationForm')->name('register2');
+Route::post('register2', 'ApiController@EditProfile');
+
+// Password Reset Routes...
+Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+
+// Auth::routes();
+
+// Route::post('/customer/login', 'AuthController@clientlogin');
 // Route::post('/customer/register', 'AuthController@clientregister');
+
 Route::get('/customer/{id}/{cat?}', 'MainController@firstPage');
 
 
@@ -25,9 +42,9 @@ Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
 Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
 
 
-Route::get('/admin', 'AuthController@login');
-Route::post('admin/login', 'AuthController@Postlogin');
-Route::get('admin/logout', 'AuthController@logout');
+Route::get('admin', 'AuthController@adminlogin');
+Route::post('admin/login', 'AuthController@adminPostlogin');
+Route::get('admin/logout', 'AuthController@adminlogout');
 
 Route::group(['middleware' => 'admin'], function () {
 

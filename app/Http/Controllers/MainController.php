@@ -20,7 +20,7 @@ class MainController extends Controller
         $items = ItemModel::where('user_id','=',$id)->where('category_id','=',$cat)->orderBy('order_by','asc')->get();
 
         // print_r(json_encode($category));die;
-        return view("client.main",['restaurant'=>$restaurant,'time'=>$time,'category'=>$category,'items'=>$items,'user'=>'guest']);
+        return view("client.main",['restaurant'=>$restaurant,'time'=>$time,'category'=>$category,'items'=>$items,'user'=>'guest','message'=>'']);
     }
 
     
