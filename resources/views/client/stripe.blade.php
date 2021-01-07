@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <style type="text/css">
         .container {
+            
             margin-top: 40px;
         }
         .panel-heading {
@@ -50,17 +51,22 @@
                                                     data-stripe-publishable-key="{{ env('STRIPE_KEY') }}"
                                                     id="payment-form">
                         @csrf
-  
+                        <input type="hidden" id="purchase_list" name="purchase_list">
+                        <input type="hidden" id="restaurantID" name="restaurantID">
+                        <input type="hidden" id="userID" name="userID">
+                        <input type="hidden" id="tot_price" name="tot_price">
                         <div class='form-row row'>
                             <div class='col-xs-12 form-group required'>
-                                <label class='control-label'>Name on Card</label> <input
+                                <label class='control-label'>Name on Card</label> 
+                                <input
                                     class='form-control' size='4' type='text'>
                             </div>
                         </div>
   
                         <div class='form-row row'>
                             <div class='col-xs-12 form-group card required'>
-                                <label class='control-label'>Card Number</label> <input
+                                <label class='control-label'>Card Number</label> 
+                                <input
                                     autocomplete='off' class='form-control card-num' size='20'
                                     type='text'>
                             </div>
@@ -73,12 +79,14 @@
                                     type='text'>
                             </div>
                             <div class='col-xs-12 col-md-4 form-group expiration required'>
-                                <label class='control-label'>Expiration Month</label> <input
+                                <label class='control-label'>Expiration Month</label> 
+                                <input
                                     class='form-control card-expiry-month' placeholder='MM' size='2'
                                     type='text'>
                             </div>
                             <div class='col-xs-12 col-md-4 form-group expiration required'>
-                                <label class='control-label'>Expiration Year</label> <input
+                                <label class='control-label'>Expiration Year</label> 
+                                <input
                                     class='form-control card-expiry-year' placeholder='YYYY' size='4'
                                     type='text'>
                             </div>
@@ -92,7 +100,13 @@
   
                         <div class="row">
                             <div class="col-xs-12">
-                                <button class="btn btn-danger btn-lg btn-block" id="subbut" type="submit">Pay Now </button>
+                                @if (Session::has('success'))
+                                    <button class="btn btn-primary btn-lg btn-block" id="subbut" type="submit">Return </button>    <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                                @else    
+                                    <button class="btn btn-danger btn-lg btn-block" id="subbut" type="submit">Pay Now </button>
+                                @endif
+
+                                
                             </div>
                         </div>                         
                     </form>
@@ -108,6 +122,18 @@
 
 <script>
     $(document).ready(function(){
+
+        @if (Session::has('success'))
+            sessionStorage.setItem("total",0);
+            sessionStorage.setItem("MyPurchase",[]);
+        @endif
+
+        $('#purchase_list').val(sessionStorage.getItem("MyPurchase"));
+        $('#restaurantID').val(sessionStorage.getItem("restaurantID"));
+        $('#userID').val(sessionStorage.getItem("userID"));
+        $('#tot_price').val(sessionStorage.getItem("total"));
+
+
         const charge = sessionStorage.getItem("total");
         $("#subbut").text("Pay Now $" + charge);
         $("#payment-form").append(`<input type="hidden" name="chargeAmount" value=${charge} >`);

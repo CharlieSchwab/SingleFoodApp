@@ -46,8 +46,6 @@ class ApiController extends Controller {
 	}
 
 	public function Login(Request $request) {
-
-		// $this->restaurant_id = 2;
 		
 		if (!empty($this->restaurant_id) && !empty($request->phone) && !empty($request->password)) {
 
