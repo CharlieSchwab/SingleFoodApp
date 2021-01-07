@@ -185,9 +185,7 @@
     </style>
 </head>
 <body onload="myFunction()">
-  @if (Session::has('message'))
-  <div id="snackbar" class="show">{{ Session::get('message') }}</div>
-  @endif
+  <div id="snackbar" class="hide">{{ Session::has('message') ? Session::get('message') : "" }}</div>
   
     <header>
         <img src="{{url('public/img/header.jpg')}}" alt="Nature" class="responsive">
@@ -343,19 +341,32 @@
         <h2 style="color:chocolate" align="center">My Purchase</h2>
         <a style="display:inline-block; margin-left:10%" href="{{url('/stripe-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
         <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
-      <div align="center">
-        <input type="radio" id="delivery" name="delivery_method" value="delivery">
-        <label for="delivery">Delivery</label>
-        <input type="radio" id="collection" name="delivery_method" value="collection">
-        <label for="collection">Collection</label><br>
+      
+      <div class="container-fluid" style="margin-top:10px;margin-bottom:10px">
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-5">
+        <input type="radio" style="display:inline-block;float:left" class="form-check-inline" id="delivery" name="delivery_method" value="delivery" checked>Delivery
+        </div>
+        <div class="col-5">
+        <input type="radio" style="display:inline-block;float:left"  class="form-check-inline" id="collection" name="delivery_method" value="collection">Collection
+        </div>
+        <div class="col-1"></div>
       </div>
-      <div align="center">
-        <input type="radio" id="card" name="payment_method" value="card">
-        <label for="card">Card</label>
-        <input type="radio" id="cash" name="payment_method" value="cash">
-        <label for="cash">Cash</label><br>
+      <div  class="row">
+        <div class="col-1"></div>
+        <div class="col-5">
+        <input type="radio" style="display:inline-block;float:left"  class="form-check-inline" id="card" name="payment_method" value="card" checked>Card
+        </div>
+        <div class="col-5">
+        <input type="radio" style="display:inline-block;float:left"  class="form-check-inline" id="cash" name="payment_method" value="cash">Cash
+        </div>
+        <div class="col-1"></div>
       </div>
-        
+      </div>
+
+
+      <div>  
         <table class="table" id="purchaseTable">
           <thead align="center">
             <tr class="table-active">
@@ -368,6 +379,7 @@
           <tbody align="center" id="listbody">
           </tbody>
         </table>
+      </div>
     </div>
     
       <div class="container">
@@ -384,7 +396,7 @@
           <tbody align="center">
             @foreach($items as $item)
             <tr>
-              <td class="itemName">{{$item->item_name}}</td>
+              <td class="itemName" itemID="{{$item->id}}" >{{$item->item_name}}</td>
               <td><img src="{{$item->item_image}}" width="200px" height="200px"></td>
               <td class="itemPrice">${{$item->price}}</td>
               <td>{{$item->item_description}}</td>
@@ -432,7 +444,13 @@
   <script>
       $(document).ready(function(){    
 
+        let restaurantID = {{ $restaurant->restaurant_id }};
+        sessionStorage.setItem("restaurantID",restaurantID);
 
+        let userID = {{ !empty(session('userid')) ? session('userid') : '' }};
+        sessionStorage.setItem("userID",userID);
+
+        let itemID;
         let itemN;
         let itemP;      
         let itemQ;        
@@ -464,7 +482,7 @@
 
         $(".delitem").click(function(){
           itemN = $(this).parent().parent().find(".itemNorm").text();
-          Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+          if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
           Mypur.forEach((item,index)=>{
             if(item!=null){
               if(item.itemN == itemN){
@@ -493,6 +511,7 @@
 
         $(".addcart").click(function(){
 
+          itemID = $(this).parent().parent().parent().find(".itemName").attr("itemID");
           itemN = $(this).parent().parent().parent().find(".itemName").text();
           itemP = parseFloat($(this).parent().parent().parent().find(".itemPrice").text().slice(1));      
           itemQ = 1;        
@@ -506,11 +525,10 @@
           $("#totPrice").text("$"+totPrice.toFixed(2));
           sessionStorage.setItem("total",totPrice.toFixed(2));
 
-          purItem = {itemN,itemP,itemQ};
+          purItem = {itemID,itemN,itemP,itemQ};
 
           // console.log(Mypur);
-
-          Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+          if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
 
           Newpur = [];
             if(Mypur){
@@ -558,7 +576,8 @@
               
           $(".delitem").click(function(){
             itemN = $(this).parent().parent().find(".itemNorm").text();
-            Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+            if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+            
             Mypur.forEach((item,index)=>{
               if(item!=null){
                 if(item.itemN == itemN){
@@ -591,7 +610,7 @@
 
         
         $("#logoutButton").click(function(){
-          alert("ok");
+
           sessionStorage.setItem("MyPurchase",[]);
           sessionStorage.setItem("total", 0);
           Mypur = [];
@@ -607,8 +626,13 @@
         // Get the snackbar DIV
         var x = document.getElementById("snackbar");
 
+
+        // console.log(x.innerHTML);
         // Add the "show" class to DIV
-        // x.className = "show";
+        if(x.innerHTML != ""){
+          x.className = "show";
+        }
+        
 
         // After 3 seconds, remove the show class from DIV
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
