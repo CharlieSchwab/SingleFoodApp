@@ -38,7 +38,7 @@ class StripeController extends Controller
         foreach ($pur_arr as $pur){
             echo $pur->itemID;
         } 
-        die;
+        // die;
   
         Session::flash('success', 'Payment has been successfully processed.');
           

@@ -199,6 +199,39 @@
         </div>    
     </header>
 
+    <button type="button" style="display:none" id ="optionButton" class="btn btn-primary" data-toggle="modal" data-target="#OptionModal"></button>
+    <div class="modal fade" id="OptionModal">
+      <div class="modal-dialog">
+        <div class="modal-content text-center">
+          <div>
+            <button type="button" style="margin:10px 10px" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div align="center"  class="text-center modal-header">
+            <h2 align="center" style="font-weight:500;margin:auto" class="modal-title"></h2>
+          </div>
+          <div class="modal-body">
+            <p align="center" class="modal-price"></p>
+            <p align="center" class="modal-desc"></p>
+            <p align="left" style="font-weight:800">Please Choose One from beneath</p>
+            
+
+            <table class="table table-striped table-hover">
+              <thead align="center">
+                <tr class="table-active">
+                  <td>Option</td>
+                  <td>Price</td>
+                  <td>Put into Cart</td>
+                </tr>
+              </thead>
+              <tbody align="center">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="myModal">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -387,8 +420,7 @@
           <thead align="center">
             <tr class="table-active">
               <td>Item</td>
-              <td>Photo</td>
-              <td>Price</td>
+              <td>Price From</td>
               <td>Description</td>
               <td>Put into Cart</td>
             </tr>
@@ -396,12 +428,10 @@
           <tbody align="center">
             @foreach($items as $item)
             <tr>
-              <td class="itemName" itemID="{{$item->id}}" >{{$item->item_name}}</td>
-              <td><img src="{{$item->item_image}}" width="200px" height="200px"></td>
+              <td class="itemName" itemID="{{$item->id}}" itemOpt="{{$item->options}}"  >{{$item->item_name}}</td>
               <td class="itemPrice">${{$item->price}}</td>
-              <td>{{$item->item_description}}</td>
-              <td><div><button class="addcart btn btn-success" {{ !empty(session('userid')) ? '' : 'disabled' }} name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></div>
-                @if (empty(session('userid'))) <p style="color:red;cursor:default"> Please signin to purchase </p> @endif
+              <td class="itemDesc">{{$item->item_description}}</td>
+              <td><div><button class="addcart btn btn-success"  name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></div>
               </td>
             </tr>
            @endforeach
@@ -447,7 +477,7 @@
         let restaurantID = {{ $restaurant->restaurant_id }};
         sessionStorage.setItem("restaurantID",restaurantID);
 
-        let userID = {{ !empty(session('userid')) ? session('userid') : '' }};
+        let userID = {{ !empty(session('userid')) ? session('userid') : 202 }};
         sessionStorage.setItem("userID",userID);
 
         let itemID;
@@ -509,13 +539,44 @@
           
         });
 
-        $(".addcart").click(function(){
+        $(".addcart").click(function(){          
 
           itemID = $(this).parent().parent().parent().find(".itemName").attr("itemID");
           itemN = $(this).parent().parent().parent().find(".itemName").text();
+          itemDesc = $(this).parent().parent().parent().find(".itemDesc").text();
           itemP = parseFloat($(this).parent().parent().parent().find(".itemPrice").text().slice(1));      
           itemQ = 1;        
           newItem = 1;  
+
+          opt = $(this).parent().parent().parent().find(".itemName").attr("itemOpt");
+          itemOpt = JSON.parse(opt);
+          
+          if (itemOpt != null){
+            $("#optionButton").click();
+            $("#OptionModal").find(".modal-title").text(itemN);
+            $("#OptionModal").find(".modal-desc").text(itemDesc);
+            $("#OptionModal").find(".modal-price").text("from $"+itemP);
+
+            // console.log(itemOpt.length);
+
+            for(let i=0;i<itemOpt.length;i++){
+              
+              $("#OptionModal").find("tbody").append(
+                `<tr><td>${itemOpt[i].option_name}</td><td>${itemOpt[i].option_price}</td>
+                  <td><div><button class="addcart2 btn btn-success"  name=""><i class="fas fa-arrow-right"></i></button></div></td></tr>`
+              );
+            }
+
+            
+          }
+
+
+
+
+
+
+
+
 
           totPrice += itemP;
 
