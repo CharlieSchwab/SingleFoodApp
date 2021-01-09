@@ -11,7 +11,7 @@ use App\Http\Controllers\StripeController;
 | Here is where you can register web routes for your application. These
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
-|
+
  */
 
  // Authentication Routes...
@@ -37,7 +37,7 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
 Route::get('/customer/{id}/{cat?}', 'MainController@firstPage');
 
-
+Route::get('/confirm-payment','MainController@confirmPage');
 Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
 Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
 
@@ -74,9 +74,6 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::post('admin/restaurant/postcodes/edit/{id}', 'RestaurantController@update_postcode');
 
 
-
-
-	//Package Start
 	Route::get('admin/package', 'PackageController@package');
 	Route::get('admin/package/edit/{id}', 'PackageController@editpackage');
 	Route::post('admin/package/edit/{id}', 'PackageController@UpdatePackage');
@@ -190,9 +187,6 @@ Route::group(['middleware' => 'restaurant'], function () {
 	Route::get('admin/ageid/updatestatus/{id}', 'AgeIdController@updatestatus');
 	Route::get('admin/ageid/delete/{id}', 'AgeIdController@destroy');
 	Route::post('admin/ageid/add_reason', 'AgeIdController@add_reason');
-
-
-
 
 });
 

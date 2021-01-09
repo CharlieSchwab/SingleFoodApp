@@ -107,6 +107,7 @@ class ApiController extends Controller {
 			Session::put('address2',$user->address_two);
 			Session::put('city',$user->city);
 			Session::put('postcode',$user->postcode);
+			Session::put('phone',$user->phone);
 
 		}
 
