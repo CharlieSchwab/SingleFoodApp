@@ -9,7 +9,7 @@ use App\UserTimeModel;
 use App\ItemModel;
 use Auth;
 use DB;
-
+use Session;
 
 class MainController extends Controller
 {
@@ -22,7 +22,7 @@ class MainController extends Controller
 
         foreach ($items as $item){
 
-            $options =  DB::table('item_option')->where('item_id','=',$item->id)->select('option_name','option_price')->get();
+            $options =  DB::table('item_option')->where('item_id','=',$item->id)->select('id','option_name','option_price')->get();
             // echo(json_encode($options));die;
             $item['options'] = $options;
         }
@@ -30,6 +30,16 @@ class MainController extends Controller
         // echo(json_encode($items));die;
         
         return view("client.main",['restaurant'=>$restaurant,'time'=>$time,'category'=>$category,'items'=>$items,'user'=>'guest','message'=>'']);
+    }
+
+    public function confirmPage(){
+
+        $user_id = Session::get('userid');
+        $user = User::where('id','=',$user_id);
+
+
+        return view("client.confirm",['user'=>$user]);
+
     }
 
     

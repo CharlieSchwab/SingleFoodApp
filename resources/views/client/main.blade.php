@@ -16,6 +16,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
+
     <style>
 
       @media only screen and (max-width: 900px) {
@@ -60,7 +61,7 @@
         position: fixed;
         z-index: 1;
         top: 0;
-        background-color: rgb(32, 26, 19);
+        background-color: rgb(233, 234, 245);
         overflow-x: hidden;
         transition: 0.5s;
         padding-top: 60px;
@@ -71,13 +72,13 @@
         padding: 8px 8px 8px 32px;
         text-decoration: none;
         font-size: 18px;
-        color: #818181;
+        color: #000000;
         display: block;
         transition: 0.3s;
       }
       
       .sidenav a:hover {
-        color: #f1f1f1;
+        color: #251515;
       }
       
       .sidenav .closebtn {
@@ -91,7 +92,7 @@
     #navbar {
       align-content: center;
       overflow: hidden;
-      background-color: #333;
+      background-color: rgb(59, 48, 48);
       padding-left:30%;
     }
 
@@ -124,13 +125,14 @@
     }
 
     #Sidenav2{
-      color: #818181;
       cursor:default;
     }
 
     #purchaseTable{
-      color: #818181;
       cursor:default;
+    }
+    table{
+      margin-top:20px;
     }
 
     .loginnav{
@@ -200,7 +202,7 @@
     </header>
 
     <button type="button" style="display:none" id ="optionButton" class="btn btn-primary" data-toggle="modal" data-target="#OptionModal"></button>
-    <div class="modal fade" id="OptionModal">
+    <div class="modal fade" id="OptionModal" >
       <div class="modal-dialog">
         <div class="modal-content text-center">
           <div>
@@ -220,7 +222,7 @@
                 <tr class="table-active">
                   <td>Option</td>
                   <td>Price</td>
-                  <td>Put into Cart</td>
+                  <td>Add</td>
                 </tr>
               </thead>
               <tbody align="center">
@@ -228,8 +230,12 @@
               </tbody>
             </table>
           </div>
+          {{-- <div>
+            <button style="height:60px;font-size:20px" class="btn btn-primary btn-block">Add to Order</button>
+          </div> --}}
         </div>
       </div>
+
     </div>
 
     <div class="modal fade" id="myModal">
@@ -348,16 +354,17 @@
     </div>
     <div id="navbar">
       <a href="javascript:openNav()">Restaurant Menu</a>
-      <a href="javascript:openNav2()">My Purchase</a>
+      <a href="javascript:openNav2()">Order Menu</a>   
+      @if(!empty(session('userid')))
+      <a href="">Previous Orders</a>
+      <a class="loginnav" data-toggle="modal" data-target="#modalProfile" >Profile</a>
+      @endif
       @if(!empty(session('userid')))
       <a class="loginnav" id="logoutButton" href="{{route('logout')}}" >Signout</a>
       @else
       <a class="loginnav" data-toggle="modal" data-target="#myModal">
         Login
       </a>
-      @endif
-      @if(!empty(session('userid')))
-      <a class="loginnav" data-toggle="modal" data-target="#modalProfile" >Profile</a>
       @endif
     </div>
 
@@ -372,7 +379,7 @@
     <div id="Sidenav2" class="sidenav">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">&times;</a>
         <h2 style="color:chocolate" align="center">My Purchase</h2>
-        <a style="display:inline-block; margin-left:10%" href="{{url('/stripe-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
+        <a style="display:inline-block; margin-left:10%" href="{{url('/confirm-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
         <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
       
       <div class="container-fluid" style="margin-top:10px;margin-bottom:10px">
@@ -386,21 +393,11 @@
         </div>
         <div class="col-1"></div>
       </div>
-      <div  class="row">
-        <div class="col-1"></div>
-        <div class="col-5">
-        <input type="radio" style="display:inline-block;float:left"  class="form-check-inline" id="card" name="payment_method" value="card" checked>Card
-        </div>
-        <div class="col-5">
-        <input type="radio" style="display:inline-block;float:left"  class="form-check-inline" id="cash" name="payment_method" value="cash">Cash
-        </div>
-        <div class="col-1"></div>
-      </div>
       </div>
 
 
-      <div>  
-        <table class="table" id="purchaseTable">
+      <div >  
+        <table style="margin-top:20px" class="table" id="purchaseTable">
           <thead align="center">
             <tr class="table-active">
               <td>Item</td>
@@ -418,21 +415,26 @@
       <div class="container">
         <table class="table table-striped table-hover">
           <thead align="center">
-            <tr class="table-active">
+            <tr class="table-active" style="font-weight:600;font-size:20px">
               <td>Item</td>
               <td>Price From</td>
               <td>Description</td>
-              <td>Put into Cart</td>
+              <td>Into Cart</td>
             </tr>
           </thead>
           <tbody align="center">
             @foreach($items as $item)
             <tr>
-              <td class="itemName" itemID="{{$item->id}}" itemOpt="{{$item->options}}"  >{{$item->item_name}}</td>
+              <td class="itemName" style="font-weight:600" itemID="{{$item->id}}" itemOpt="{{$item->options}}"  >{{$item->item_name}}</td>
               <td class="itemPrice">${{$item->price}}</td>
               <td class="itemDesc">{{$item->item_description}}</td>
+              @if ($item['options'] =="[]")
               <td><div><button class="addcart btn btn-success"  name="{{$item->item_name}}"><i class="fas fa-arrow-right"></i></button></div>
               </td>
+              @else
+              <td><div><button class="openplus btn btn-primary"  name="{{$item->item_name}}"><i class="fas fa-plus"></i></button></div>
+              </td>
+              @endif
             </tr>
            @endforeach
           </tbody>
@@ -539,6 +541,41 @@
           
         });
 
+        $(".openplus").click(function(){
+
+          itemID = $(this).parent().parent().parent().find(".itemName").attr("itemID");
+          itemN = $(this).parent().parent().parent().find(".itemName").text();
+          itemDesc = $(this).parent().parent().parent().find(".itemDesc").text();
+          itemP = parseFloat($(this).parent().parent().parent().find(".itemPrice").text().slice(1));      
+          itemQ = 1;    
+
+          opt = $(this).parent().parent().parent().find(".itemName").attr("itemOpt");
+          itemOpt = JSON.parse(opt);
+
+          // console.log(itemOpt);
+          
+          $("#optionButton").click();
+          $("#OptionModal").find(".modal-title").text(itemN);
+          $("#OptionModal").find(".modal-desc").text(itemDesc);
+          $("#OptionModal").find(".modal-price").text("from $"+itemP);
+
+          // console.log(itemOpt.length);
+          $("#OptionModal").find("tbody").empty();
+          $("#OptionModal").find("tbody").append(
+              `<tr><td>Normal</td><td>$${(itemP).toFixed(2)}</td>
+                <td><button itemID =${(itemID)} itemN =${(itemN)} itemDesc =${(itemDesc)} itemP =${(itemP)} class="addcart2 btn btn-success" data-dismiss="modal" option_id="0" name=""><i class="fas fa-arrow-right" ></i></button></td></tr>`
+            );
+          
+          for(let i=0;i<itemOpt.length;i++){
+            
+            $("#OptionModal").find("tbody").append(
+              `<tr><td>${itemOpt[i].option_name}</td><td class="price">$${(Number(itemOpt[i].option_price)+Number(itemP)).toFixed(2)}</td>
+                <td><button option_name=${itemOpt[i].option_name}  itemID =${(itemID)} itemN =${(itemN)}  class="addcart2 btn btn-success" data-dismiss="modal" option_id="${itemOpt[i].id}" ><i class="fas fa-arrow-right" ></i></button></td></tr>`
+            );
+          }     
+        });
+
+        
         $(".addcart").click(function(){          
 
           itemID = $(this).parent().parent().parent().find(".itemName").attr("itemID");
@@ -548,35 +585,7 @@
           itemQ = 1;        
           newItem = 1;  
 
-          opt = $(this).parent().parent().parent().find(".itemName").attr("itemOpt");
-          itemOpt = JSON.parse(opt);
-          
-          if (itemOpt != null){
-            $("#optionButton").click();
-            $("#OptionModal").find(".modal-title").text(itemN);
-            $("#OptionModal").find(".modal-desc").text(itemDesc);
-            $("#OptionModal").find(".modal-price").text("from $"+itemP);
-
-            // console.log(itemOpt.length);
-
-            for(let i=0;i<itemOpt.length;i++){
-              
-              $("#OptionModal").find("tbody").append(
-                `<tr><td>${itemOpt[i].option_name}</td><td>${itemOpt[i].option_price}</td>
-                  <td><div><button class="addcart2 btn btn-success"  name=""><i class="fas fa-arrow-right"></i></button></div></td></tr>`
-              );
-            }
-
-            
-          }
-
-
-
-
-
-
-
-
+          // console.log(totPrice);
 
           totPrice += itemP;
 
@@ -601,8 +610,6 @@
             sessionStorage.setItem("MyPurchase",JSON.stringify(Newpur));
           }
             
-
-          
           if(Mypur != null){
             Mypur.forEach(item=>{
               if(item){
@@ -681,23 +688,129 @@
         
       });
 
-     
 
       function myFunction() {
-        // Get the snackbar DIV
+
         var x = document.getElementById("snackbar");
 
-
-        // console.log(x.innerHTML);
-        // Add the "show" class to DIV
         if(x.innerHTML != ""){
           x.className = "show";
         }
-        
-
-        // After 3 seconds, remove the show class from DIV
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
       }
+
+      $(document).on('click', '.addcart2', function(){
+
+        optionID = $(this).attr('option_id');
+        optionN = $(this).attr('option_name');
+        itemID = $(this).attr("itemID");
+        itemN = $(this).attr("itemN");
+        itemP = Number($(this).parent().parent().find(".price").text().slice(1));
+        itemQ = 1;   
+        newItem = 1;  
+
+        let Mypur = [];
+        let Newpur = [];  
+        let purItem;
+        
+        totPrice = Number(sessionStorage.getItem("total"));
+        totPrice += itemP;
+        $("#totPrice").text("$"+totPrice.toFixed(2));
+        sessionStorage.setItem("total",totPrice.toFixed(2));
+  
+        // purItem = {itemID,itemN,optionID,optionN,itemP,itemQ};
+
+        // if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+
+        // if(Mypur != null){
+        //   Mypur.forEach(item=>{
+        //     if(item){
+        //       if(item.itemN == itemN){
+        //         newItem = 0;
+        //         item.itemQ = parseInt(item.itemQ) + 1;
+        //         itemQ = item.itemQ;
+        //         item.itemP = (parseFloat(itemP) * itemQ).toFixed(2);
+        //         itemP = item.itemP;
+        //       }
+        //     }
+        //   });
+        //   if(newItem == 1){
+        //     Mypur.push(purItem);
+        //   }
+        // }else{
+        //   Mypur = [];
+        //   Mypur.push(purItem);
+        // }
+        // sessionStorage.setItem("MyPurchase",JSON.stringify(Mypur));
+        
+        window.location.reload(false);
+
+
+        // if(Mypur != null){
+        //   Mypur.forEach(item=>{
+        //     if(item){
+        //       if(item.itemN == itemN){
+        //         newItem = 0;
+        //         item.itemQ = parseInt(item.itemQ) + 1;
+        //         itemQ = item.itemQ;
+        //         item.itemP = (parseFloat(itemP) * itemQ).toFixed(2);
+        //         itemP = item.itemP;
+        //       }
+        //     }
+        //   });
+        //   if(newItem == 1){
+        //     Mypur.push(purItem);
+        //   }
+        // }else{
+        //   Mypur = [];
+        //   Mypur.push(purItem);
+        // }
+        // sessionStorage.setItem("MyPurchase",JSON.stringify(Mypur));
+
+        // $.each($("#listbody").children(), function( index) {
+        //   if($(this).find(".itemNorm").text()==itemN){
+        //     $(this).find(".itemQuan").text(itemQ);
+        //     $(this).find(".itemP").text("$"+itemP);
+        //   }
+        // });
+
+        // if(newItem == 1){
+        //   $("#listbody").append(`<tr><td class="itemNorm">${itemN}</td><td class="itemQuan">${itemQ}</td><td class="itemP">$${itemP}</td><td><button class="delitem btn btn-danger"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
+        // }
+            
+        // $(".delitem").click(function(){
+        //   itemN = $(this).parent().parent().find(".itemNorm").text();
+        //   if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+          
+        //   Mypur.forEach((item,index)=>{
+        //     if(item!=null){
+        //       if(item.itemN == itemN){
+        //         delete Mypur[index];
+        //         totPrice -= item.itemP;
+        //         if(totPrice == 0){
+        //           $("#buycart").attr('dsabled','true');
+        //         }
+        //         $("#totPrice").text("$"+totPrice.toFixed(2));
+        //         sessionStorage.setItem("total",totPrice.toFixed(2));
+        //       }
+        //     }
+        //   });
+
+
+        //   Newpur = [];
+        //   for(let i=0;i<Mypur.length;i++){
+        //     if(Mypur[i]){
+        //       Newpur.push(Mypur[i]);
+        //     }
+        //   }
+
+
+        //   sessionStorage.setItem("MyPurchase",JSON.stringify(Newpur));
+        //   $(this).parent().parent().remove();
+        
+        // });
+      });
+          
 
     </script>
 </body>
