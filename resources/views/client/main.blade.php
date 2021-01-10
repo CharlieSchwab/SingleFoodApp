@@ -57,11 +57,13 @@
 
       .sidenav {
         height: 100%;
+        border-color:#000000;
+        border-width:2px;
         width: 0;
         position: fixed;
         z-index: 1;
         top: 0;
-        background-color: rgb(233, 234, 245);
+        background-color: rgb(238, 238, 238);
         overflow-x: hidden;
         transition: 0.5s;
         padding-top: 60px;
@@ -378,9 +380,7 @@
 
     <div id="Sidenav2" class="sidenav">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">&times;</a>
-        <h2 style="color:chocolate" align="center">My Purchase</h2>
-        <a style="display:inline-block; margin-left:10%" href="{{url('/confirm-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
-        <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
+        <h2 style="color:chocolate" align="center">Your Order</h2>
       
       <div class="container-fluid" style="margin-top:10px;margin-bottom:10px">
       <div class="row">
@@ -395,6 +395,29 @@
       </div>
       </div>
 
+      
+
+        <table class="table">
+          <tbody align="center">
+            <tr>
+              <td>Subtotal</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>10% Discount</td>
+              <td ></td>
+            </tr>
+            <tr>
+              <td>Delivery Fee</td>
+              <td > 0</td>
+            </tr>
+            <tr>
+              <td><b>Total</b></td>
+              <td id="totPrice"></td>
+            </tr>
+          </tbody>
+        </table>
+      <a  href="{{url('/confirm-payment')}}"  }}><button class="btn btn-primary btn-block" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i> Go to Payment</button></a>
 
       <div >  
         <table style="margin-top:20px" class="table" id="purchaseTable">
@@ -685,8 +708,9 @@
           totPrice = 0;
         });
 
-        
       });
+
+      
 
 
       function myFunction() {
