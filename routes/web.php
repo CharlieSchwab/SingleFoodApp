@@ -37,6 +37,7 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
 Route::get('/customer/{id}/{cat?}', 'MainController@firstPage');
 
+Route::get('/thankyou', 'StripeController@thankyou');
 Route::get('/confirm-payment','MainController@confirmPage');
 Route::get('/stripe-payment', [StripeController::class, 'handleGet']);
 Route::post('/stripe-payment', [StripeController::class, 'handlePost'])->name('stripe.payment');
