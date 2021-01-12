@@ -57,11 +57,13 @@
 
       .sidenav {
         height: 100%;
+        border-color:#000000;
+        border-width:2px;
         width: 0;
         position: fixed;
         z-index: 1;
         top: 0;
-        background-color: rgb(233, 234, 245);
+        background-color: rgb(238, 238, 238);
         overflow-x: hidden;
         transition: 0.5s;
         padding-top: 60px;
@@ -202,6 +204,7 @@
     </header>
 
     <button type="button" style="display:none" id ="optionButton" class="btn btn-primary" data-toggle="modal" data-target="#OptionModal"></button>
+    
     <div class="modal fade" id="OptionModal" >
       <div class="modal-dialog">
         <div class="modal-content text-center">
@@ -378,9 +381,7 @@
 
     <div id="Sidenav2" class="sidenav">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">&times;</a>
-        <h2 style="color:chocolate" align="center">My Purchase</h2>
-        <a style="display:inline-block; margin-left:10%" href="{{url('/confirm-payment')}}"><button class="btn btn-primary" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i>  Purchase Now!</button></a>
-        <p style="display:inline; color:chocolate;font-size:20px" id="totPrice"></p>
+        <h2 style="color:chocolate" align="center">Your Order</h2>
       
       <div class="container-fluid" style="margin-top:10px;margin-bottom:10px">
       <div class="row">
@@ -395,6 +396,29 @@
       </div>
       </div>
 
+      
+
+        <table class="table">
+          <tbody align="center">
+            <tr>
+              <td>Subtotal</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>10% Discount</td>
+              <td ></td>
+            </tr>
+            <tr>
+              <td>Delivery Fee</td>
+              <td > 0</td>
+            </tr>
+            <tr>
+              <td><b>Total</b></td>
+              <td id="totPrice"></td>
+            </tr>
+          </tbody>
+        </table>
+      <a  href="{{url('/confirm-payment')}}"  }}><button class="btn btn-primary btn-block" {{ !empty(session('userid')) ? '' : 'disabled' }} id="buycart"><i class="fa fa-credit-card"></i> Go to Payment</button></a>
 
       <div >  
         <table style="margin-top:20px" class="table" id="purchaseTable">
@@ -562,14 +586,14 @@
           // console.log(itemOpt.length);
           $("#OptionModal").find("tbody").empty();
           $("#OptionModal").find("tbody").append(
-              `<tr><td>Normal</td><td>$${(itemP).toFixed(2)}</td>
-                <td><button itemID =${(itemID)} itemN =${(itemN)} itemDesc =${(itemDesc)} itemP =${(itemP)} class="addcart2 btn btn-success" data-dismiss="modal" option_id="0" name=""><i class="fas fa-arrow-right" ></i></button></td></tr>`
+              `<tr><td>Normal</td><td class="price">$${(itemP).toFixed(2)}</td>
+                <td><button itemID =${(itemID)} itemN =${(itemN)} itemDesc =${(itemDesc)} itemP =${Number(itemP)} class="addcart2 btn btn-success" data-dismiss="modal" option_id="0" name=""><i class="fas fa-arrow-right" ></i></button></td></tr>`
             );
           
           for(let i=0;i<itemOpt.length;i++){
             
             $("#OptionModal").find("tbody").append(
-              `<tr><td>${itemOpt[i].option_name}</td><td class="price">$${(Number(itemOpt[i].option_price)+Number(itemP)).toFixed(2)}</td>
+              `<tr><td class="optionNa">${itemOpt[i].option_name}</td><td class="price">$${(Number(itemOpt[i].option_price)+Number(itemP)).toFixed(2)}</td>
                 <td><button option_name=${itemOpt[i].option_name}  itemID =${(itemID)} itemN =${(itemN)}  class="addcart2 btn btn-success" data-dismiss="modal" option_id="${itemOpt[i].id}" ><i class="fas fa-arrow-right" ></i></button></td></tr>`
             );
           }     
@@ -581,7 +605,9 @@
           itemID = $(this).parent().parent().parent().find(".itemName").attr("itemID");
           itemN = $(this).parent().parent().parent().find(".itemName").text();
           itemDesc = $(this).parent().parent().parent().find(".itemDesc").text();
-          itemP = parseFloat($(this).parent().parent().parent().find(".itemPrice").text().slice(1));      
+          itemP = parseFloat($(this).parent().parent().parent().find(".itemPrice").text().slice(1));
+          optionID = 0;
+          optionN = "";      
           itemQ = 1;        
           newItem = 1;  
 
@@ -595,7 +621,7 @@
           $("#totPrice").text("$"+totPrice.toFixed(2));
           sessionStorage.setItem("total",totPrice.toFixed(2));
 
-          purItem = {itemID,itemN,itemP,itemQ};
+          purItem = {itemID,itemN,optionID,optionN,itemP,itemQ};
 
           // console.log(Mypur);
           if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
@@ -685,8 +711,9 @@
           totPrice = 0;
         });
 
-        
       });
+
+      
 
 
       function myFunction() {
@@ -701,10 +728,13 @@
 
       $(document).on('click', '.addcart2', function(){
 
+        optionN = $(this).parent().parent().find(".optionNa").text();
         optionID = $(this).attr('option_id');
-        optionN = $(this).attr('option_name');
+        itemN = $(this).parent().parent().parent().parent().parent().parent().find('.modal-title').text();
         itemID = $(this).attr("itemID");
-        itemN = $(this).attr("itemN");
+
+        console.log(itemN);
+        console.log(optionN);
         itemP = Number($(this).parent().parent().find(".price").text().slice(1));
         itemQ = 1;   
         newItem = 1;  
@@ -718,65 +748,44 @@
         $("#totPrice").text("$"+totPrice.toFixed(2));
         sessionStorage.setItem("total",totPrice.toFixed(2));
   
-        // purItem = {itemID,itemN,optionID,optionN,itemP,itemQ};
+        purItem = {itemID,itemN,optionID,optionN,itemP,itemQ};
 
-        // if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
+        if (sessionStorage.getItem("MyPurchase")) Mypur = JSON.parse(sessionStorage.getItem("MyPurchase"));
 
-        // if(Mypur != null){
-        //   Mypur.forEach(item=>{
-        //     if(item){
-        //       if(item.itemN == itemN){
-        //         newItem = 0;
-        //         item.itemQ = parseInt(item.itemQ) + 1;
-        //         itemQ = item.itemQ;
-        //         item.itemP = (parseFloat(itemP) * itemQ).toFixed(2);
-        //         itemP = item.itemP;
-        //       }
-        //     }
-        //   });
-        //   if(newItem == 1){
-        //     Mypur.push(purItem);
-        //   }
-        // }else{
-        //   Mypur = [];
-        //   Mypur.push(purItem);
-        // }
-        // sessionStorage.setItem("MyPurchase",JSON.stringify(Mypur));
+        newItem = 1;
+
+        if(Mypur != null){
+          Mypur.forEach(item=>{
+            if(item){
+              if(item.itemID == itemID && item.optionID == optionID){
+                newItem = 0;
+                item.itemQ = parseInt(item.itemQ) + 1;
+                itemQ = item.itemQ;
+                item.itemP = (parseFloat(itemP) * itemQ).toFixed(2);
+                itemP = item.itemP;
+              }
+            }
+          });
+          if(newItem == 1){
+            Mypur.push(purItem);
+          }
+        }else{
+          Mypur = [];
+          Mypur.push(purItem);
+        }
+        sessionStorage.setItem("MyPurchase",JSON.stringify(Mypur));
         
-        window.location.reload(false);
 
+        $.each($("#listbody").children(), function( index) {
+          if($(this).find(".itemNorm").text()==itemN){
+            $(this).find(".itemQuan").text(itemQ);
+            $(this).find(".itemP").text("$"+itemP);
+          }
+        });
 
-        // if(Mypur != null){
-        //   Mypur.forEach(item=>{
-        //     if(item){
-        //       if(item.itemN == itemN){
-        //         newItem = 0;
-        //         item.itemQ = parseInt(item.itemQ) + 1;
-        //         itemQ = item.itemQ;
-        //         item.itemP = (parseFloat(itemP) * itemQ).toFixed(2);
-        //         itemP = item.itemP;
-        //       }
-        //     }
-        //   });
-        //   if(newItem == 1){
-        //     Mypur.push(purItem);
-        //   }
-        // }else{
-        //   Mypur = [];
-        //   Mypur.push(purItem);
-        // }
-        // sessionStorage.setItem("MyPurchase",JSON.stringify(Mypur));
-
-        // $.each($("#listbody").children(), function( index) {
-        //   if($(this).find(".itemNorm").text()==itemN){
-        //     $(this).find(".itemQuan").text(itemQ);
-        //     $(this).find(".itemP").text("$"+itemP);
-        //   }
-        // });
-
-        // if(newItem == 1){
-        //   $("#listbody").append(`<tr><td class="itemNorm">${itemN}</td><td class="itemQuan">${itemQ}</td><td class="itemP">$${itemP}</td><td><button class="delitem btn btn-danger"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
-        // }
+        if(newItem == 1){
+          $("#listbody").append(`<tr><td class="itemNorm">${itemN}</td><td class="itemQuan">${itemQ}</td><td class="itemP">$${itemP}</td><td><button class="delitem btn btn-danger"><i class="fa fa-ban" aria-hidden="true"></i></button</td></tr>`);
+        }
             
         // $(".delitem").click(function(){
         //   itemN = $(this).parent().parent().find(".itemNorm").text();
