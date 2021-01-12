@@ -45,80 +45,95 @@
     <h1 align="center">How would you like to pay?</h1>
     <div class="row">
         <div class="col-md-5 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-body">  
-                    
-                    <form role="form" action="{{ route('stripe.payment') }}" method="post" class="validation"
-                                                     data-cc-on-file="false"
-                                                    data-stripe-publishable-key="{{ env('STRIPE_KEY') }}"
-                                                    id="payment-form">
-                        @csrf
-                        <input type="hidden" id="purchase_list" name="purchase_list">
-                        <input type="hidden" id="restaurantID" name="restaurantID">
-                        <input type="hidden" id="userID" name="userID">
-                        <input type="hidden" id="tot_price" name="tot_price">
-                        <div class='form-row row'>
-                            <div class="option"> 
-                                <input id="card" type="radio" checked name="payment-method">
-                                <label for="card">Pay with Card</label>
+            <form action="{{ url('stripe-payment') }}" method="post" id="payment-form">
+                @csrf
+                <div class="option"> 
+                    <input id="card" type="radio" checked name="payment-method">
+                    <label for="card">Pay with Card</label>
+                </div>
+                <hr>
+                <div id="card_details">
+                @if (session()->has('error'))
+                    <div class="text-danger font-italic">{{ session()->get('error') }}</div>
+                @endif
+                
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <label for="name">Name</label>
+                            @error('name')
+                            <div class="text-danger font-italic">{{ $message }}</div>
+                            @enderror
+                            <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <label for="email">Email</label>
+                            @error('email')
+                            <div class="text-danger font-italic">{{ $message }}</div>
+                            @enderror
+                            <input type="text" name="email" id="email" class="form-control" value="{{ old('email') }}">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <!-- Display errors returned by createToken -->
+                            <label>Card Number</label>
+                            <div id="paymentResponse" class="text-danger font-italic"></div>
+                            <div id="card_number" class="field form-control"></div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-3">
+                            <label>Expiry Date</label>
+                            <div id="card_expiry" class="field form-control"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>CVC Code</label>
+                            <div id="card_cvc" class="field form-control"></div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-check form-check-inline custom-control custom-checkbox">
+                                <input type="checkbox" name="terms_conditions" id="terms_conditions" class="custom-control-input">
+                                <label for="terms_conditions" class="custom-control-label">
+                                    I agree to terms & conditions
+                                </label>
                             </div>
-                            <div id="card_details">
-                            <div class='form-row row'>
-                                <div class='col-xs-10 form-group required'>
-                                    <label class='control-label'>Name on Card</label> <input
-                                        class='form-control' size='4' type='text' required>
-                                </div>
-                            </div>
-            
-                            <div class='form-row row'>
-                                <div class='col-xs-10 form-group card required'>
-                                    <label class='control-label'>Card Number</label> <input
-                                        autocomplete='on' class='form-control card-num' size='20'
-                                        type='text' required>
-                                </div>
-                            </div>
-
-                            <div class='form-row row'>
-                                <div class='col-xs-10 col-md-4 form-group cvc required'>
-                                    <label class='control-label'>CVC</label> 
-                                    <input autocomplete='on' class='form-control card-cvc' placeholder='e.g 415' size='4'
-                                        type='text' required >
-                                </div>
-                            </div>
-                            <div class='form-row row'>
-                                <div class='col-xs-10 col-md-4 form-group cvc required'>
-                                    <label class='control-label'>Expiration Month</label> <input
-                                        class='form-control card-expiry-month' placeholder='MM' size='2'
-                                        type='text' required autocomplete="on">
-                                </div>
-                            </div>
-                            <div class='form-row row'>
-                                <div class='col-xs-10 col-md-4 form-group cvc required'>
-                                    <label class='control-label'>Expiration Year</label> <input
-                                        class='form-control card-expiry-year' placeholder='YYYY' size='4'
-                                        type='text' required autocomplete="on">
-                                </div>
-                            </div>
-                            </div>
-
-                            <div class="option"> 
-                                <input id="cash" type="radio" name="payment-method">
-                                <label for="cash">Pay with Cash</label>
+                            @error('terms_conditions')
+                            <div class="text-danger font-italic">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12 small text-muted">
+                            <div class="alert alert-warning">
+                                <strong>NOTE: </strong> All the payments are handled by <a target="_blank"
+                                    href="https://stripe.com">STRIPE</a>. We don't store any of your data.
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-10 col-xs-offset-1">
-                                @if (Session::has('success'))
-                                    <a href=""><button class="btn btn-primary btn-lg btn-block" id="close" type="button">Return </button> </a>
-                                @else    
-                                    <button class="btn btn-danger btn-lg btn-block" id="checkout" type="submit">Place Order</button>
-                                @endif
-                                
-                            </div>
-                        </div>                         
-                    </form>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="text-danger font-italic generic-errors"></div>
+                        </div>
+                    </div>               
                 </div>
-            </div>        
+                <div class="option"> 
+                    <input id="cash" type="radio" name="payment-method">
+                    <label for="cash">Pay with Cash</label>
+                </div>
+                <input type="hidden" id="purchase_list" name="purchase_list">
+                <input type="hidden" id="restaurantID" name="restaurantID">
+                <input type="hidden" id="userID" name="userID">
+                <input type="hidden" id="tot_price" name="tot_price">
+                <div class="row form-group">
+                    <div class="col-md-6 col-md-offset-3">
+                        <input type="submit" value="Place Order" class="btn btn-primary pay-via-stripe-btn">
+                    </div>
+                </div>
+            </form>
         </div>
             
 
@@ -147,8 +162,8 @@
     $(document).ready(function(){
 
         @if (Session::has('success'))
-            sessionStorage.setItem("total",0);
-            sessionStorage.setItem("MyPurchase",[]);
+            sessionStorage.setItem("total","0");
+            sessionStorage.setItem("MyPurchase","[]");
         @endif
 
         $('#purchase_list').val(sessionStorage.getItem("MyPurchase"));
@@ -177,59 +192,103 @@
     })
 </script>
 
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
 
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-  
-<script type="text/javascript">
-$(function() {
-    var $form         = $(".validation");
-  $('form.validation').bind('submit', function(e) {
-    var $form         = $(".validation"),
-        inputVal = ['input[type=email]', 'input[type=password]',
-                         'input[type=text]', 'input[type=file]',
-                         'textarea'].join(', '),
-        $inputs       = $form.find('.required').find(inputVal),
-        $errorStatus = $form.find('div.error'),
-        valid         = true;
-        $errorStatus.addClass('hide');
- 
-        $('.has-error').removeClass('has-error');
-    $inputs.each(function(i, el) {
-      var $input = $(el);
-      if ($input.val() === '') {
-        $input.parent().addClass('has-error');
-        $errorStatus.removeClass('hide');
-        e.preventDefault();
-      }
-    });
-  
-    if (!$form.data('cc-on-file')) {
-      e.preventDefault();
-      Stripe.setPublishableKey($form.data('stripe-publishable-key'));
-      Stripe.createToken({
-        number: $('.card-num').val(),
-        cvc: $('.card-cvc').val(),
-        exp_month: $('.card-expiry-month').val(),
-        exp_year: $('.card-expiry-year').val()
-      }, stripeHandleResponse);
-    }
-  
-  });
-  
-  function stripeHandleResponse(status, response) {
-        if (response.error) {
-            $('.error')
-                .removeClass('hide')
-                .find('.alert')
-                .text(response.error.message);
-        } else {
-            var token = response['id'];
-            $form.find('input[type=text]').empty();
-            $form.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
-            $form.get(0).submit();
+    var stripe = Stripe('{{ env("STRIPE_KEY") }}');
+
+    var elements = stripe.elements();
+
+    var style = {
+        base: {
+            fontWeight: 400,
+            fontFamily: '"DM Sans", Roboto, Open Sans, Segoe UI, sans-serif',
+            fontSize: '16px',
+            lineHeight: '1.4',
+            color: '#1b1642',
+            padding: '.75rem 1.25rem',
+            '::placeholder': {
+                color: '#ccc',
+            },
+        },
+        invalid: {
+            color: '#dc3545',
         }
+    };
+
+    var cardElement = elements.create('cardNumber', {
+        style: style
+    });
+    cardElement.mount('#card_number');
+
+    var exp = elements.create('cardExpiry', {
+        'style': style
+    });
+    exp.mount('#card_expiry');
+
+    var cvc = elements.create('cardCvc', {
+        'style': style
+    });
+    cvc.mount('#card_cvc');
+
+    var resultContainer = document.getElementById('paymentResponse');
+    cardElement.addEventListener('change', function (event) {
+        if (event.error) {
+            resultContainer.innerHTML = '<p>' + event.error.message + '</p>';
+        } else {
+            resultContainer.innerHTML = '';
+        }
+    });
+
+    var form = document.getElementById('payment-form');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        createToken();
+    });
+
+    function createToken() {
+        stripe.createToken(cardElement).then(function (result) {
+            if (result.error) {
+
+                resultContainer.innerHTML = '<p>' + result.error.message + '</p>';
+            } else {
+                stripeTokenHandler(result.token);
+            }
+        });
     }
-  
-});
+
+    function stripeTokenHandler(token) {
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', token.id);
+        form.appendChild(hiddenInput);
+
+        form.submit();
+    }
+
+    $('.pay-via-stripe-btn').on('click', function () {
+        var payButton   = $(this);
+        var name        = $('#name').val();
+        var email       = $('#email').val();
+
+        if (name == '' || name == 'undefined') {
+            $('.generic-errors').html('Name field required.');
+            return false;
+        }
+        if (email == '' || email == 'undefined') {
+            $('.generic-errors').html('Email field required.');
+            return false;
+        }
+
+        if(!$('#terms_conditions').prop('checked')){
+            $('.generic-errors').html('The terms conditions must be accepted.');
+            return false;
+        }
+    });
+
 </script>
+
 </html>
