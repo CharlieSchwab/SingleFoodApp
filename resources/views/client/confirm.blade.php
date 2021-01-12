@@ -38,7 +38,7 @@
             <div class="col-md-6 " >
                 <div class="card" style="margin-top:20px">
                     <div class="container">
-                        <h2 align="center" style="margin-top:40px">{{Session::get('name')}}: Confirm your details</h2>
+                        <h2 align="center" style="margin-top:40px">{{$user->username}}: Confirm your details</h2>
                         <a href="javascript:history.back()"><p align="center">Return to switch accounts</p></a>
 
                         <form action="{{url('/stripe-payment')}}">

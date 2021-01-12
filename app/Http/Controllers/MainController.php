@@ -35,7 +35,7 @@ class MainController extends Controller
     public function confirmPage(){
 
         $user_id = Session::get('userid');
-        $user = User::where('id','=',$user_id);
+        $user = User::where('id','=',$user_id)->first();
 
 
         return view("client.confirm",['user'=>$user]);

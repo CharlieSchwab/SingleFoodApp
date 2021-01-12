@@ -25,6 +25,22 @@ class StripeController extends Controller
      */
     public function handlePost(Request $request)
     {
+        
+        // $pur_arr = json_decode($request->purchase_list);
+        // $user_id = $request->userID;
+        // $restaurant_id = $request->restaurantID;
+
+        // echo $user_id;
+        // echo $restaurant_id;
+
+        // foreach ($pur_arr as $pur){
+        //     echo $pur->itemID;
+        // } 
+
+
+
+
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
         Charge::create ([
                 "amount" => 100 * $request->chargeAmount,
@@ -32,18 +48,6 @@ class StripeController extends Controller
                 "source" => $request->stripeToken,
                 "description" => "Making test payment." 
         ]);
-
-        $pur_arr = json_decode($request->purchase_list);
-        $user_id = $request->userID;
-        $restaurant_id = $request->restaurantID;
-
-        echo $user_id;
-        echo $restaurant_id;
-
-        foreach ($pur_arr as $pur){
-            echo $pur->itemID;
-        } 
-        // die;
   
         Session::flash('success', 'Payment has been successfully processed.');
           
